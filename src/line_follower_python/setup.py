@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            "line_sensor = line_follower_python.line_sensor:main"
         ],
     },
 )

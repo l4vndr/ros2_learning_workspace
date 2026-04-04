@@ -17,7 +17,7 @@ class ResetSrv(Node):
             self.get_logger().warn("Waiting for server...")
 
         future = self.reset_count_client.call_async(request=req)
-        future.add_done_callback(lambda f: self.srvCompleteCallback(future, req))
+        future.add_done_callback(lambda f: self.srvCompleteCallback(f, req))
 
     def srvCompleteCallback(self, future, request: SetBool.Request):
         response: SetBool.Response = future.result()
