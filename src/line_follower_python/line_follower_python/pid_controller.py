@@ -4,7 +4,7 @@ from rclpy.node import Node
 from example_interfaces.msg import Int8
 from example_interfaces.msg import Bool
 
-# from example_interfaces.srv
+from example_interfaces.srv import AddTwoInts
 
 
 class PIDController(Node):
@@ -29,10 +29,20 @@ class PIDController(Node):
             Int8, "angular_vel", 10
         )
 
-        self.get_logger().info("PID Controller Started")
-        self.create_timer(
-            1 / 500, lambda: (self.updateVelocities(), self.publishVelocity())
+        self.pid_update_service = self.create_service(
+            AddTwoInts, "update_pid", self.updatePID
         )
+
+        self.get_logger().info("PID Controller Started")
+        self.create_timer(1, lambda: (self.updateVelocities(), self.publishVelocity()))
+
+    def updatePID(self, request: AddTwoInts.Request, response: AddTwoInts.Response):
+        self.PID["Kp"] = request.a
+        self.PID["Kd"] = request.b
+
+        self.get_logger().info(f"PID UPDATED!\n{self.PID["Kp"]}\n{self.PID["Kp"]}")
+        response.sum = 1
+        return response
 
     def updateLineError(self, msg: Int8):
         self.line_error_ = msg.data
