@@ -34,7 +34,9 @@ class PIDController(Node):
         )
 
         self.get_logger().info("PID Controller Started")
-        self.create_timer(1, lambda: (self.updateVelocities(), self.publishVelocity()))
+        self.create_timer(
+            1 / 500, lambda: (self.updateVelocities(), self.publishVelocity())
+        )
 
     def updatePID(self, request: AddTwoInts.Request, response: AddTwoInts.Response):
         self.PID["Kp"] = request.a

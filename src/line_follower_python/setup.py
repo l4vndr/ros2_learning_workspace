@@ -25,6 +25,7 @@ setup(
         "console_scripts": [
             "line_sensor = line_follower_python.line_sensor:main",
             "pid_controller = line_follower_python.pid_controller:main",
+            "motor_driver = line_follower_python.motor_driver:main",
         ],
     },
 )
