@@ -71,7 +71,7 @@ private:
       req->power_on = false;
     }
 
-    while (!led_state_client_->wait_for_service(std::chrono::seconds(1))) {
+    if (!led_state_client_->wait_for_service(std::chrono::seconds(1))) {
       RCLCPP_WARN(get_logger(), "Waiting for server...");
     }
 
