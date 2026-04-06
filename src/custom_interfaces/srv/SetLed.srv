@@ -1,0 +1,5 @@
+int16 led_number
+bool power_on
+---
+bool success
+string msg
