@@ -33,6 +33,7 @@ setup(
             "number_publisher = my_py_pkg.number_publisher:main",
             "number_counter = my_py_pkg.number_counter:main",
             "number_publisher_client = my_py_pkg.number_publisher_client:main",
+            "led_panel = my_py_pkg.led_panel:main",
         ],
     },
 )
