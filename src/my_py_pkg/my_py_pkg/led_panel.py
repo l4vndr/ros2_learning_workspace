@@ -25,19 +25,24 @@ class LedPanel(Node):
 
         self.led_state_publisher_.publish(led_state_msg_)
 
-    def setLed(self, request: SetLed.Request, response: SetLed.Response):
+    def setLed(self, request, response):
         ledNumber = request.led_number
         newPowerStatus = request.power_on
 
         if ledNumber >= len(self.led_state_) or ledNumber < 0:
             response.success = False
             response.msg = "Invalid led number"
+            return response
 
+        if newPowerStatus:
+            for i in range(len(self.led_state_)):
+                self.led_state_[i] = i <= ledNumber
         else:
-            self.led_state_[ledNumber] = newPowerStatus
-            response.msg = "Success"
-            response.success = True
+            for i in range(len(self.led_state_)):
+                self.led_state_[i] = False
 
+        response.success = True
+        response.msg = "Success"
         return response
 
 
