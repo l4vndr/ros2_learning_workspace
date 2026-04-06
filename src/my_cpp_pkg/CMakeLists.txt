@@ -9,6 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(example_interfaces REQUIRED)
+find_package(custom_interfaces REQUIRED)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -23,6 +24,8 @@ add_executable(sum_server_client_oop src/sum_server_client_oop.cpp)
 add_executable(number_publisher src/number_publisher.cpp)
 add_executable(number_counter src/number_counter.cpp)
 add_executable(number_publisher_client src/number_publisher_client.cpp)
+add_executable(led_panel_cpp src/led_panel_cpp.cpp)
+add_executable(battery_cpp src/battery_cpp.cpp)
 
 
 ament_target_dependencies(cpp_node rclcpp)
@@ -35,6 +38,8 @@ ament_target_dependencies(sum_server_client_oop rclcpp example_interfaces)
 ament_target_dependencies(number_publisher rclcpp example_interfaces)
 ament_target_dependencies(number_counter rclcpp example_interfaces)
 ament_target_dependencies(number_publisher_client rclcpp example_interfaces)
+ament_target_dependencies(led_panel_cpp rclcpp custom_interfaces)
+ament_target_dependencies(battery_cpp rclcpp custom_interfaces)
 
 
 install(TARGETS
@@ -48,6 +53,8 @@ install(TARGETS
   number_publisher
   number_counter
   number_publisher_client
+  led_panel_cpp
+  battery_cpp
   DESTINATION lib/${PROJECT_NAME}
 )
 
