@@ -25,8 +25,21 @@ class LedPanel(Node):
 
         self.led_state_publisher_.publish(led_state_msg_)
 
-    def setLed(self, request, response):
-        pass
+    def setLed(self, request: SetLed.Request, response: SetLed.Response):
+        ledNumber = request.led_number
+        newPowerStatus = request.power_on
+
+        if ledNumber >= len(self.led_state_) or ledNumber < 0:
+            response.success = False
+            response.msg = "Invalid led number"
+
+        else:
+            self.led_state_[ledNumber] = newPowerStatus
+            response.msg = "Success"
+            response.success = True
+
+        return response
+
 
 def main(args=None):
     rclpy.init(args=args)
