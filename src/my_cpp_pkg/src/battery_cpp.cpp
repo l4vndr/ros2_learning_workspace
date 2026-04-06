@@ -4,8 +4,6 @@
 #include "custom_interfaces/srv/set_led.hpp"
 #include <chrono>
 #include <cmath>
-#include <cstdint>
-#include <memory>
 #include <vector>
 
 class BatteryCpp : public rclcpp::Node {

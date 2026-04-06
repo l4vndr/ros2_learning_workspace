@@ -3,11 +3,6 @@
 #include "custom_interfaces/msg/led_state.hpp"
 #include "custom_interfaces/srv/set_led.hpp"
 #include <chrono>
-#include <iterator>
-#include <memory>
-#include <rclcpp/executors.hpp>
-#include <rclcpp/timer.hpp>
-#include <rclcpp/utilities.hpp>
 #include <vector>
 
 class LedPanel : public rclcpp::Node {
