@@ -20,7 +20,9 @@ class Battery(Node):
         )
         self.led_state_client = self.create_client(SetLed, "set_led")
 
-        self.create_timer(1.0, lambda: (self.updateBatteryLevel(), self.callLedSetterSrv()))
+        self.create_timer(
+            1.0, lambda: (self.updateBatteryLevel(), self.callLedSetterSrv())
+        )
 
     def updateLedState(self, msg: LedState):
         self.led_panel_state = list(msg.led_state)[:]
@@ -29,8 +31,6 @@ class Battery(Node):
         )
 
     def updateBatteryLevel(self):
-        self.get_logger().info(f"{self.batteryLevel}")
-
         end = time.time() % 100
 
         if self.batteryLevel > 0:
@@ -44,8 +44,6 @@ class Battery(Node):
 
     def callLedSetterSrv(self):
         request = SetLed.Request()
-
-        self.get_logger().info(f"{self.batteryLevel}")
 
         if self.batteryLevel >= 100 - 100 / 3:
             request.led_number = 2
