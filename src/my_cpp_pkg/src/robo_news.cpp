@@ -12,7 +12,8 @@ public:
     publisher_ = this->create_publisher<example_interfaces::msg::String>(
         "robot_news", 10);
 
-    this->declare_parameter("name", name);
+    this->declare_parameter("name", "C-BOT");
+    name = this->get_parameter("name").as_string();
 
     param_callback_handler = this->add_post_set_parameters_callback(
         [this](const std::vector<rclcpp::Parameter> &params)
