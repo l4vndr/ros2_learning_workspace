@@ -1,0 +1,9 @@
+/number_publisher1:
+  ros__parameters:
+    number: 169
+    freq: 0.1
+
+/number_publisher2:
+  ros__parameters:
+    number: 132
+    freq: 0.5
