@@ -1,0 +1,25 @@
+<launch>
+    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_r2d2" namespace="India">
+        <!-- <remap from="robot_news" to="robot_news_r2d2" /> -->
+        <param from="$(find-pkg-share radio_launch)/config/radio.yaml" />
+    </node>
+    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_c3po" namespace="India">
+        <!-- <remap from="robot_news" to="robot_news_r2d2" /> -->
+        <param from="$(find-pkg-share radio_launch)/config/radio.yaml" />
+    </node>
+    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_bb8" namespace="India">
+        <!-- <remap from="robot_news" to="robot_news_r2d2" /> -->
+        <param from="$(find-pkg-share radio_launch)/config/radio.yaml" />
+    </node>
+    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_giskard" namespace="India">
+        <!-- <remap from="robot_news" to="robot_news_r2d2" /> -->
+        <param from="$(find-pkg-share radio_launch)/config/radio.yaml" />
+    </node>
+    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_daneel" namespace="India">
+        <!-- <remap from="robot_news" to="robot_news_r2d2" /> -->
+        <param from="$(find-pkg-share radio_launch)/config/radio.yaml" />
+    </node>
+    <node pkg="my_py_pkg" exec="robo_news_rec" name="smartphone" namespace="India">
+        <!-- <remap from="robot_news" to="robot_news_r2d2" /> -->
+    </node>
+</launch>
