@@ -38,7 +38,6 @@ public:
   }
 
 private:
-
   bool approximatelyEqualRel(double a, double b, double relEpsilon) {
     return (std::abs(a - b) <=
             (std::max(std::abs(a), std::abs(b)) * relEpsilon));
@@ -105,8 +104,8 @@ private:
     double currentMin = INFINITY;
     // for (auto coord : coords_) {
     // for (int i{}; i < this->coords_.size(); i += 1) {
-    for (auto coord: coords_){
-    //   auto coord = this->coords_[i];
+    for (auto coord : coords_) {
+      //   auto coord = this->coords_[i];
       double x2 = coord[0];
       double y2 = coord[1];
 
@@ -138,8 +137,8 @@ private:
 
   std::map<char, double> masterPose_;
 
-  std::list<std::vector<double>>coords_;
-//   std::vector<std::vector<double>> coords_;
+  std::list<std::vector<double>> coords_;
+  //   std::vector<std::vector<double>> coords_;
 
   double targetX_, targetY_;
   int targetIndex_;
