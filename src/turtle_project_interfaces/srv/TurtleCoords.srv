@@ -1,4 +1,4 @@
-int32 i # Get coords of ith turtle before the latest. 0 gives the coords of latest turtle
+# Get the coords of the latest spawned turtle
 ---
 float32 x
 float32 y
