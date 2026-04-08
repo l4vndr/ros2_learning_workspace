@@ -35,17 +35,21 @@ private:
           request,
       turtle_project_interfaces::srv::TurtleCoords::Response::SharedPtr
           response) {
-    int index{request->i};
-    if (index >= static_cast<int>(this->coordinates.size()) || index < 0) {
-      response->success = false;
-      response->msg = "Out of bounds";
-      return;
-    }
-    index = this->coordinates.size() - index - 1;
+    // int index{request->i};
+    // if (index >= static_cast<int>(this->coordinates.size()) || index < 0) {
+    //   response->success = false;
+    //   response->msg = "Out of bounds";
+    //   return;
+    // }
+    // index = this->coordinates.size() - index - 1;
+    // response->success = true;
+    // response->x = this->coordinates[index][0];
+    // response->y = this->coordinates[index][1];
+    // response->yaw_in_rad = this->coordinates[index][2];
     response->success = true;
-    response->x = this->coordinates[index][0];
-    response->y = this->coordinates[index][1];
-    response->yaw_in_rad = this->coordinates[index][2];
+    response->x = currentX_;
+    response->y = currentY_;
+    response->yaw_in_rad = currentYawInRads;
     response->msg = "Successful Transaction";
     return;
   }
@@ -99,13 +103,13 @@ private:
     RCLCPP_INFO(get_logger(), "Turtle Spawned at (%.2f, %.2f)\nName: %s",
                 currentX_, currentY_, result->name.c_str());
 
-    this->updateRecords();
+    // this->updateRecords();
   }
 
-  void updateRecords() {
-    std::vector<double> coords{currentX_, currentY_, currentYawInRads};
-    this->coordinates.push_back(coords);
-  }
+  // void updateRecords() {
+  //   std::vector<double> coords{currentX_, currentY_, currentYawInRads};
+  //   this->coordinates.push_back(coords);
+  // }
 
   rclcpp::Publisher<turtle_project_interfaces::msg::SpawnedTurtle>::SharedPtr
       spawned_turtle_info_publisher_;
@@ -114,7 +118,7 @@ private:
       turtle_coordinates_service_;
   rclcpp::TimerBase::SharedPtr timer_;
   double currentX_, currentY_, currentYawInRads;
-  std::vector<std::vector<double>> coordinates;
+  // std::vector<std::vector<double>> coordinates;
 };
 
 int main(int argc, char **argv) {
