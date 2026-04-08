@@ -16,6 +16,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/SpawnedTurtle.msg"
   "msg/TargetCoordinate.msg"
   "srv/TurtleCoords.srv"
+  "srv/RemoveTurtle.srv"
 )
 
 ament_export_dependencies(rosidl_default_runtime)

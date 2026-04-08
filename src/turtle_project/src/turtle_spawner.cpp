@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <memory>
 #include <random>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -50,6 +51,7 @@ private:
     response->x = currentX_;
     response->y = currentY_;
     response->yaw_in_rad = currentYawInRads;
+    response->name = turtleName_;
     response->msg = "Successful Transaction";
     return;
   }
@@ -100,6 +102,7 @@ private:
     currentX_ = request->x;
     currentY_ = request->y;
     currentYawInRads = request->theta;
+    turtleName_ = request->name;
     RCLCPP_INFO(get_logger(), "Turtle Spawned at (%.2f, %.2f)\nName: %s",
                 currentX_, currentY_, result->name.c_str());
 
@@ -118,6 +121,7 @@ private:
       turtle_coordinates_service_;
   rclcpp::TimerBase::SharedPtr timer_;
   double currentX_, currentY_, currentYawInRads;
+  std::string turtleName_;
   // std::vector<std::vector<double>> coordinates;
 };
 

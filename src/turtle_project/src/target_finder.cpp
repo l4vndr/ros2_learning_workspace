@@ -1,6 +1,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "turtle_project_interfaces/msg/spawned_turtle.hpp"
 #include "turtle_project_interfaces/msg/target_coordinate.hpp"
+#include "turtle_project_interfaces/srv/remove_turtle.hpp"
 #include "turtle_project_interfaces/srv/turtle_coords.hpp"
 #include "turtlesim/msg/pose.hpp"
 #include <chrono>
@@ -8,7 +9,6 @@
 #include <list>
 #include <map>
 #include <memory>
-#include <rclcpp/timer.hpp>
 #include <vector>
 
 class TargetFinder : public rclcpp::Node {
@@ -32,6 +32,8 @@ public:
 
     target_coord_publisher_ = this->create_publisher<
         turtle_project_interfaces::msg::TargetCoordinate>("/target_coord", 10);
+    
+    // remove_turtle_service_ = this->create_service<turtle_project_interfaces::srv::RemoveTurtle>("/remove_turtle")
 
     timer_ = create_wall_timer(std::chrono::microseconds(500),
                                [this]() { this->timerCallback(); });
@@ -134,11 +136,13 @@ private:
   rclcpp::Publisher<turtle_project_interfaces::msg::TargetCoordinate>::SharedPtr
       target_coord_publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
+  rclcpp::Service<turtle_project_interfaces::srv::RemoveTurtle>::SharedPtr
+      remove_turtle_service_;
 
   std::map<char, double> masterPose_;
 
   std::list<std::vector<double>> coords_;
-  //   std::vector<std::vector<double>> coords_;
+  // std::vector<std::vector<double>> coords_;
 
   double targetX_, targetY_;
   int targetIndex_;
