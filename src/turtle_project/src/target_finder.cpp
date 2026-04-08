@@ -5,6 +5,7 @@
 #include "turtlesim/msg/pose.hpp"
 #include <chrono>
 #include <cmath>
+#include <list>
 #include <map>
 #include <memory>
 #include <rclcpp/timer.hpp>
@@ -84,8 +85,9 @@ private:
     double targetX = 0.0, targetY = 0.0;
     double currentMin = INFINITY;
     // for (auto coord : coords_) {
-    for (int i{}; i < this->coords_.size(); i += 1) {
-      auto coord = this->coords_[i];
+    // for (int i{}; i < this->coords_.size(); i += 1) {
+    for (auto coord: coords_){
+    //   auto coord = this->coords_[i];
       double x2 = coord[0];
       double y2 = coord[1];
 
@@ -94,7 +96,7 @@ private:
         currentMin = newDistance;
         targetX = x2;
         targetY = y2;
-        targetIndex_ = i;
+        // targetIndex_ = i;
       }
     }
     this->targetX_ = targetX;
@@ -117,7 +119,8 @@ private:
 
   std::map<char, double> masterPose_;
 
-  std::vector<std::vector<double>> coords_;
+  std::list<std::vector<double>>coords_;
+//   std::vector<std::vector<double>> coords_;
 
   double targetX_, targetY_;
   int targetIndex_;
