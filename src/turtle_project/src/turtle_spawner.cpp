@@ -3,6 +3,7 @@
 #include "turtle_project_interfaces/srv/turtle_coords.hpp"
 #include "turtlesim/srv/spawn.hpp"
 #include <chrono>
+#include <cstdint>
 #include <cstdlib>
 #include <memory>
 #include <random>
@@ -35,7 +36,7 @@ private:
       turtle_project_interfaces::srv::TurtleCoords::Response::SharedPtr
           response) {
     int index{request->i};
-    if (index >= this->coordinates.size() || index < 0) {
+    if (index >= static_cast<int>(this->coordinates.size()) || index < 0) {
       response->success = false;
       response->msg = "Out of bounds";
       return;
@@ -102,7 +103,7 @@ private:
   }
 
   void updateRecords() {
-    std::vector<double> coords{currentX_, currentX_, currentYawInRads};
+    std::vector<double> coords{currentX_, currentY_, currentYawInRads};
     this->coordinates.push_back(coords);
   }
 
