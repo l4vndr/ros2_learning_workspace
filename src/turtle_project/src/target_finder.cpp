@@ -9,6 +9,8 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 class TargetFinder : public rclcpp::Node {
@@ -32,8 +34,9 @@ public:
 
     target_coord_publisher_ = this->create_publisher<
         turtle_project_interfaces::msg::TargetCoordinate>("/target_coord", 10);
-    
-    // remove_turtle_service_ = this->create_service<turtle_project_interfaces::srv::RemoveTurtle>("/remove_turtle")
+
+    // remove_turtle_service_ =
+    // this->create_service<turtle_project_interfaces::srv::RemoveTurtle>("/remove_turtle")
 
     timer_ = create_wall_timer(std::chrono::microseconds(500),
                                [this]() { this->timerCallback(); });
@@ -62,6 +65,7 @@ private:
     auto msg = turtle_project_interfaces::msg::TargetCoordinate();
     msg.x = this->targetX_;
     msg.y = this->targetY_;
+    msg.name = this->targetName_;
     target_coord_publisher_->publish(msg);
   }
   void updateMasterCoord(turtlesim::msg::Pose msg) {
@@ -92,9 +96,11 @@ private:
       rclcpp::Client<turtle_project_interfaces::srv::TurtleCoords>::SharedFuture
           future) {
     auto result = future.get();
+    std::string name = result->name;
     std::vector<double> coords{result->x, result->y, result->yaw_in_rad};
 
-    this->coords_.push_back(coords);
+    // this->coords_.push_back(coords);
+    this->coords_[name] = coords;
     this->calculateTarget();
   }
 
@@ -108,15 +114,17 @@ private:
     // for (int i{}; i < this->coords_.size(); i += 1) {
     for (auto coord : coords_) {
       //   auto coord = this->coords_[i];
-      double x2 = coord[0];
-      double y2 = coord[1];
+      std::string name = coord.first;
+      auto ordinates = coord.second;
+      double x2 = ordinates[0];
+      double y2 = ordinates[1];
 
       double newDistance = this->distance(x1, y1, x2, y2);
       if (currentMin > newDistance) {
         currentMin = newDistance;
         targetX = x2;
         targetY = y2;
-        // targetIndex_ = i;
+        targetName_ = name;
       }
     }
     this->targetX_ = targetX;
@@ -141,11 +149,12 @@ private:
 
   std::map<char, double> masterPose_;
 
-  std::list<std::vector<double>> coords_;
+  //   std::list<std::vector<double>> coords_;
+  std::unordered_map<std::string, std::vector<double>> coords_;
   // std::vector<std::vector<double>> coords_;
 
   double targetX_, targetY_;
-  int targetIndex_;
+  std::string targetName_;
 };
 
 int main(int argc, char **argv) {
