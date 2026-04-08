@@ -1,25 +1,34 @@
 <launch>
-    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_r2d2" namespace="/India">
-        <!-- <remap from="robot_news" to="robot_news_r2d2" /> -->
+    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_r2d2">
+        <remap from="/robot_news" to="/India/robot_news" />
         <param from="$(find-pkg-share radio_launch)/config/radio.yaml" />
     </node>
-    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_c3po" namespace="/India">
+    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_c3po">
         <!-- <remap from="robot_news" to="robot_news_r2d2" /> -->
+        <remap from="/robot_news" to="/India/robot_news" />
+
         <param from="$(find-pkg-share radio_launch)/config/radio.yaml" />
     </node>
-    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_bb8" namespace="/India">
+    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_bb8">
         <!-- <remap from="robot_news" to="robot_news_r2d2" /> -->
+        <remap from="/robot_news" to="/India/robot_news" />
+
         <param from="$(find-pkg-share radio_launch)/config/radio.yaml" />
     </node>
-    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_giskard" namespace="/India">
+    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_giskard">
         <!-- <remap from="robot_news" to="robot_news_r2d2" /> -->
+        <remap from="/robot_news" to="/India/robot_news" />
+
         <param from="$(find-pkg-share radio_launch)/config/radio.yaml" />
     </node>
-    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_daneel" namespace="/India">
+    <node pkg="my_cpp_pkg" exec="robo_news" name="robot_news_daneel">
         <!-- <remap from="robot_news" to="robot_news_r2d2" /> -->
+        <remap from="/robot_news" to="/India/robot_news" />
+
         <param from="$(find-pkg-share radio_launch)/config/radio.yaml" />
     </node>
-    <node pkg="my_py_pkg" exec="robo_news_rec" name="smartphone" namespace="/India">
+    <node pkg="my_py_pkg" exec="robo_news_rec" name="smartphone">
         <!-- <remap from="robot_news" to="robot_news_r2d2" /> -->
+        <remap from="/robot_news" to="/India/robot_news" />
     </node>
 </launch>

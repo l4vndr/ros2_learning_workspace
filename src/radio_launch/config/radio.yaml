@@ -1,19 +1,19 @@
-/India/robot_news_r2d2:
+/robot_news_r2d2:
   ros__parameters:
     name: "R2D2"
 
-/India/robot_news_c3po:
+/robot_news_c3po:
   ros__parameters:
     name: "C3PO"
 
-/India/robot_news_bb8:
+/robot_news_bb8:
   ros__parameters:
     name: "BB8"
 
-/India/robot_news_giskard:
+/robot_news_giskard:
   ros__parameters:
     name: "GISKARD"
 
-/India/robot_news_daneel:
+/robot_news_daneel:
   ros__parameters:
     name: "DANEEL"
