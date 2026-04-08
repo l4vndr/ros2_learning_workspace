@@ -1,13 +1,13 @@
 #include "rclcpp/rclcpp.hpp"
 #include "turtle_project_interfaces/msg/spawned_turtle.hpp"
+#include "turtle_project_interfaces/msg/target_coordinate.hpp"
 #include "turtle_project_interfaces/srv/turtle_coords.hpp"
 #include "turtlesim/msg/pose.hpp"
 #include <chrono>
 #include <cmath>
 #include <map>
 #include <memory>
-#include <rclcpp/client.hpp>
-#include <rclcpp/subscription.hpp>
+#include <rclcpp/timer.hpp>
 #include <vector>
 
 class TargetFinder : public rclcpp::Node {
@@ -28,9 +28,21 @@ public:
     turtle_coords_client_ =
         this->create_client<turtle_project_interfaces::srv::TurtleCoords>(
             "/get_turtle_coords");
+
+    target_coord_publisher_ = this->create_publisher<
+        turtle_project_interfaces::msg::TargetCoordinate>("/target_coord", 10);
+
+    timer_ = create_wall_timer(std::chrono::microseconds(500),
+                               [this]() { this->timerCallback(); });
   }
 
 private:
+  void timerCallback() {
+    auto msg = turtle_project_interfaces::msg::TargetCoordinate();
+    msg.x = this->targetX_;
+    msg.y = this->targetY_;
+    target_coord_publisher_->publish(msg);
+  }
   void updateMasterCoord(turtlesim::msg::Pose msg) {
     masterPose_['x'] = msg.x;
     masterPose_['y'] = msg.y;
@@ -62,23 +74,27 @@ private:
     std::vector<double> coords{result->x, result->y, result->yaw_in_rad};
 
     this->coords_.push_back(coords);
+    this->calculateTarget();
   }
 
-  void calculateClosest() {
+  void calculateTarget() {
     double x1 = masterPose_['x'];
     double y1 = masterPose_['y'];
 
     double targetX = 0.0, targetY = 0.0;
     double currentMin = INFINITY;
-    for (auto it : coords_) {
-      double x2 = it[0];
-      double y2 = it[1];
+    // for (auto coord : coords_) {
+    for (int i{}; i < this->coords_.size(); i += 1) {
+      auto coord = this->coords_[i];
+      double x2 = coord[0];
+      double y2 = coord[1];
 
       double newDistance = this->distance(x1, y1, x2, y2);
       if (currentMin > newDistance) {
         currentMin = newDistance;
         targetX = x2;
         targetY = y2;
+        targetIndex_ = i;
       }
     }
     this->targetX_ = targetX;
@@ -95,12 +111,16 @@ private:
       turtle_coords_client_;
   rclcpp::Subscription<turtlesim::msg::Pose>::SharedPtr
       master_turtle_pose_subscription_;
+  rclcpp::Publisher<turtle_project_interfaces::msg::TargetCoordinate>::SharedPtr
+      target_coord_publisher_;
+  rclcpp::TimerBase::SharedPtr timer_;
 
   std::map<char, double> masterPose_;
 
   std::vector<std::vector<double>> coords_;
 
   double targetX_, targetY_;
+  int targetIndex_;
 };
 
 int main(int argc, char **argv) {
