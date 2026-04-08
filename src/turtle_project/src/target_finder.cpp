@@ -1,9 +1,13 @@
 #include "rclcpp/rclcpp.hpp"
 #include "turtle_project_interfaces/msg/spawned_turtle.hpp"
 #include "turtle_project_interfaces/srv/turtle_coords.hpp"
+#include "turtlesim/msg/pose.hpp"
 #include <chrono>
+#include <cmath>
+#include <map>
 #include <memory>
 #include <rclcpp/client.hpp>
+#include <rclcpp/subscription.hpp>
 #include <vector>
 
 class TargetFinder : public rclcpp::Node {
@@ -11,7 +15,15 @@ public:
   TargetFinder() : rclcpp::Node("target_finder") {
     turtle_spawned_subscription_ = this->create_subscription<
         turtle_project_interfaces::msg::SpawnedTurtle>(
-        "turtle_spawn_info", 10, [this]() { this->handleNewTurtleSpawn(); });
+        "turtle_spawn_info", 10,
+        [this](turtle_project_interfaces::msg::SpawnedTurtle msg) {
+          this->handleNewTurtleSpawn(msg);
+        });
+
+    master_turtle_pose_subscription_ =
+        this->create_subscription<turtlesim::msg::Pose>(
+            "/master_turtle/pose", 10,
+            [this](turtlesim::msg::Pose msg) { this->updateMasterCoord(msg); });
 
     turtle_coords_client_ =
         this->create_client<turtle_project_interfaces::srv::TurtleCoords>(
@@ -19,7 +31,17 @@ public:
   }
 
 private:
-  void handleNewTurtleSpawn() {
+  void updateMasterCoord(turtlesim::msg::Pose msg) {
+    masterPose_['x'] = msg.x;
+    masterPose_['y'] = msg.y;
+    masterPose_['Z'] = msg.theta;
+  }
+
+  void handleNewTurtleSpawn(turtle_project_interfaces::msg::SpawnedTurtle msg) {
+    if (!msg.spawned_turtle) {
+      return;
+    }
+
     auto request = std::make_shared<
         turtle_project_interfaces::srv::TurtleCoords::Request>();
 
@@ -41,12 +63,44 @@ private:
 
     this->coords_.push_back(coords);
   }
+
+  void calculateClosest() {
+    double x1 = masterPose_['x'];
+    double y1 = masterPose_['y'];
+
+    double targetX = 0.0, targetY = 0.0;
+    double currentMin = INFINITY;
+    for (auto it : coords_) {
+      double x2 = it[0];
+      double y2 = it[1];
+
+      double newDistance = this->distance(x1, y1, x2, y2);
+      if (currentMin > newDistance) {
+        currentMin = newDistance;
+        targetX = x2;
+        targetY = y2;
+      }
+    }
+    this->targetX_ = targetX;
+    this->targetY_ = targetY;
+  }
+
+  double distance(double x1, double y1, double x2, double y2) {
+    return std::hypot(x1 - x2, y1 - y2);
+  }
+
   rclcpp::Subscription<turtle_project_interfaces::msg::SpawnedTurtle>::SharedPtr
       turtle_spawned_subscription_;
   rclcpp::Client<turtle_project_interfaces::srv::TurtleCoords>::SharedPtr
       turtle_coords_client_;
+  rclcpp::Subscription<turtlesim::msg::Pose>::SharedPtr
+      master_turtle_pose_subscription_;
+
+  std::map<char, double> masterPose_;
 
   std::vector<std::vector<double>> coords_;
+
+  double targetX_, targetY_;
 };
 
 int main(int argc, char **argv) {
