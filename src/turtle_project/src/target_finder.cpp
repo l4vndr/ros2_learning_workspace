@@ -35,14 +35,29 @@ public:
     target_coord_publisher_ = this->create_publisher<
         turtle_project_interfaces::msg::TargetCoordinate>("/target_coord", 10);
 
-    // remove_turtle_service_ =
-    // this->create_service<turtle_project_interfaces::srv::RemoveTurtle>("/remove_turtle")
+    remove_turtle_service_ = this->create_service<
+        turtle_project_interfaces::srv::RemoveTurtle>(
+        "/remove_turtle",
+        [this](const turtle_project_interfaces::srv::RemoveTurtle::Request::
+                   SharedPtr request,
+               turtle_project_interfaces::srv::RemoveTurtle::Response::SharedPtr
+                   response) { this->removeTurtleService(request, response); });
 
     timer_ = create_wall_timer(std::chrono::microseconds(500),
                                [this]() { this->timerCallback(); });
   }
 
 private:
+  void removeTurtleService(
+      const turtle_project_interfaces::srv::RemoveTurtle::Request::SharedPtr
+          request,
+      turtle_project_interfaces::srv::RemoveTurtle::Response::SharedPtr
+          response) {
+    std::string name = request->name;
+    this->coords_.erase(name);
+    response->success = true;
+  }
+
   bool approximatelyEqualRel(double a, double b, double relEpsilon) {
     return (std::abs(a - b) <=
             (std::max(std::abs(a), std::abs(b)) * relEpsilon));
