@@ -1,5 +1,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include "turtle_project_interfaces/msg/spawned_turtle.hpp"
+#include "turtle_project_interfaces/srv/turtle_coords.hpp"
 #include "turtlesim/srv/spawn.hpp"
 #include <chrono>
 #include <cstdlib>
@@ -15,12 +16,39 @@ public:
     spawned_turtle_info_publisher_ =
         this->create_publisher<turtle_project_interfaces::msg::SpawnedTurtle>(
             "turtle_spawn_info", 10);
+    turtle_coordinates_service_ = this->create_service<
+        turtle_project_interfaces::srv::TurtleCoords>(
+        "/get_turtle_coords",
+        [this](const turtle_project_interfaces::srv::TurtleCoords::Request::
+                   SharedPtr request,
+               turtle_project_interfaces::srv::TurtleCoords::Response::SharedPtr
+                   response) { this->getTurtleCoords(request, response); });
 
     this->timer_ = this->create_wall_timer(std::chrono::seconds(2),
                                            [this]() { this->timerCallback(); });
   }
 
 private:
+  void getTurtleCoords(
+      const turtle_project_interfaces::srv::TurtleCoords::Request::SharedPtr
+          request,
+      turtle_project_interfaces::srv::TurtleCoords::Response::SharedPtr
+          response) {
+    int index{request->i};
+    if (index >= this->coordinates.size() || index < 0) {
+      response->success = false;
+      response->msg = "Out of bounds";
+      return;
+    }
+    index = this->coordinates.size() - index - 1;
+    response->success = true;
+    response->x = this->coordinates[index][0];
+    response->y = this->coordinates[index][1];
+    response->yaw_in_rad = this->coordinates[index][2];
+    response->msg = "Successful Transaction";
+    return;
+  }
+
   void timerCallback() { this->spawnTurtle(); }
 
   double getRandomNumber(double i = 1.0, double j = 10.0) {
@@ -81,6 +109,8 @@ private:
   rclcpp::Publisher<turtle_project_interfaces::msg::SpawnedTurtle>::SharedPtr
       spawned_turtle_info_publisher_;
   rclcpp::Client<turtlesim::srv::Spawn>::SharedPtr turtle_spawn_client_;
+  rclcpp::Service<turtle_project_interfaces::srv::TurtleCoords>::SharedPtr
+      turtle_coordinates_service_;
   rclcpp::TimerBase::SharedPtr timer_;
   double currentX_, currentY_, currentYawInRads;
   std::vector<std::vector<double>> coordinates;
