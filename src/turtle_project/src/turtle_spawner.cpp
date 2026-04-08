@@ -30,24 +30,6 @@ public:
   }
 
 private:
-  bool approximatelyEqualRel(double a, double b, double relEpsilon) {
-    return (std::abs(a - b) <=
-            (std::max(std::abs(a), std::abs(b)) * relEpsilon));
-  }
-
-  // Return true if the difference between a and b is less than or equal to
-  // absEpsilon, or within relEpsilon percent of the larger of a and b
-  bool approximatelyEqualAbsRel(double a, double b, double absEpsilon = 1e-12,
-                                double relEpsilon = 1e-8) {
-    // Check if the numbers are really close -- needed when comparing numbers
-    // near zero.
-    if (std::abs(a - b) <= absEpsilon)
-      return true;
-
-    // Otherwise fall back to Knuth's algorithm
-    return approximatelyEqualRel(a, b, relEpsilon);
-  }
-
   void getTurtleCoords(
       const turtle_project_interfaces::srv::TurtleCoords::Request::SharedPtr
           request,
