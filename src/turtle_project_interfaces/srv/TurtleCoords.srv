@@ -3,3 +3,5 @@ int32 i # Get coords of ith turtle before the latest. 0 gives the coords of late
 float32 x
 float32 y
 float32 yaw_in_rad
+bool success
+string msg
