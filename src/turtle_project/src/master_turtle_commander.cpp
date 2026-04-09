@@ -1,9 +1,11 @@
+#include "geometry_msgs/msg/twist.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "turtle_project_interfaces/msg/spawned_turtle.hpp"
 #include "turtle_project_interfaces/msg/target_coordinate.hpp"
 #include "turtle_project_interfaces/srv/remove_turtle.hpp"
 #include "turtlesim/msg/pose.hpp"
 #include "turtlesim/srv/kill.hpp"
+#include <chrono>
 #include <cmath>
 #include <numeric>
 #include <rcl/publisher.h>
@@ -32,9 +34,36 @@ public:
           this->updateTargetDistance();
           this->updateTargetYaw();
         });
+
+    velocity_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>(
+        "/master_turtle/cmd_vel", 10);
+
+    timer_ = this->create_wall_timer(std::chrono::seconds(1),
+                                     [this]() { publishVelocityCommand(); });
   }
 
 private:
+  void publishVelocityCommand() {
+    auto velCmd = geometry_msgs::msg::Twist();
+    double kv = 1.25;
+    double kav = 1.25;
+    double minSpeed = 1;
+
+    double velocitX = kv * targetDistance_;
+    if (abs(targetYaw_) < 0.1) {
+      velocitX = kv * targetDistance_;
+    } else {
+      velocitX = minSpeed;
+    }
+    velocitX = velocitX * std::cos(targetYaw_);
+    double anglularVelocity = kav * targetYaw_;
+
+    velCmd.linear.x = velocitX;
+    velCmd.angular.z = anglularVelocity;
+
+    velocity_publisher_->publish(velCmd);
+  }
+
   void updateMasterPos(turtlesim::msg::Pose msg) {
     masterX_ = msg.x;
     masterY_ = msg.y;
@@ -83,7 +112,7 @@ private:
       master_pose_subscription_;
   rclcpp::Subscription<turtle_project_interfaces::msg::TargetCoordinate>::
       SharedPtr target_coords_subscription_;
-  rclcpp::Publisher<turtlesim::msg::Pose>::SharedPtr velocity_publisher_;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr velocity_publisher_;
   rclcpp::Client<turtle_project_interfaces::srv::RemoveTurtle>::SharedPtr
       remove_turtle_subscription_;
   rclcpp::Client<turtlesim::srv::Kill>::SharedPtr kill_turtle_client_;
