@@ -7,6 +7,7 @@
 #include "turtlesim/srv/kill.hpp"
 #include <chrono>
 #include <cmath>
+#include <memory>
 #include <numeric>
 #include <rcl/publisher.h>
 #include <rclcpp/client.hpp>
@@ -38,11 +39,33 @@ public:
     velocity_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>(
         "/master_turtle/cmd_vel", 10);
 
-    timer_ = this->create_wall_timer(std::chrono::seconds(1),
-                                     [this]() { publishVelocityCommand(); });
+    kill_turtle_client_ = this->create_client<turtlesim::srv::Kill>("/kill");
+    remove_turtle_client_ =
+        this->create_client<turtle_project_interfaces::srv::RemoveTurtle>(
+            "/remove_turtle");
+
+    timer_ = this->create_wall_timer(std::chrono::milliseconds(50), [this]() {
+      publishVelocityCommand();
+      handleTargetReach();
+    });
   }
 
 private:
+  void handleTargetReach() {
+    std::string currentTargetName = this->targetName_;
+    if (targetDistance_ <= 0.1) {
+      auto killReq = std::make_shared<turtlesim::srv::Kill::Request>();
+      auto removeReq = std::make_shared<
+          turtle_project_interfaces::srv::RemoveTurtle::Request>();
+
+      killReq->name = currentTargetName;
+      removeReq->name = currentTargetName;
+
+      kill_turtle_client_->async_send_request(killReq);
+      remove_turtle_client_->async_send_request(removeReq);
+    }
+  }
+
   void publishVelocityCommand() {
     auto velCmd = geometry_msgs::msg::Twist();
     double kv = 1.25;
@@ -114,7 +137,7 @@ private:
       SharedPtr target_coords_subscription_;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr velocity_publisher_;
   rclcpp::Client<turtle_project_interfaces::srv::RemoveTurtle>::SharedPtr
-      remove_turtle_subscription_;
+      remove_turtle_client_;
   rclcpp::Client<turtlesim::srv::Kill>::SharedPtr kill_turtle_client_;
   rclcpp::TimerBase::SharedPtr timer_;
   double masterX_, masterY_, masterYaw_, targetDistance_, targetYaw_;
