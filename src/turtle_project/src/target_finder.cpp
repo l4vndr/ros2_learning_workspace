@@ -2,7 +2,6 @@
 #include "turtle_project_interfaces/msg/spawned_turtle.hpp"
 #include "turtle_project_interfaces/msg/target_coordinate.hpp"
 #include "turtle_project_interfaces/srv/remove_turtle.hpp"
-#include "turtle_project_interfaces/srv/turtle_coords.hpp"
 #include "turtlesim/msg/pose.hpp"
 #include <chrono>
 #include <cmath>
@@ -27,10 +26,6 @@ public:
             "/master_turtle/pose", 10,
             [this](turtlesim::msg::Pose msg) { this->updateMasterCoord(msg); });
 
-    turtle_coords_client_ =
-        this->create_client<turtle_project_interfaces::srv::TurtleCoords>(
-            "/get_turtle_coords");
-
     target_coord_publisher_ = this->create_publisher<
         turtle_project_interfaces::msg::TargetCoordinate>("/target_coord", 10);
 
@@ -44,6 +39,8 @@ public:
 
     timer_ = create_wall_timer(std::chrono::milliseconds(500),
                                [this]() { this->timerCallback(); });
+
+    RCLCPP_INFO(get_logger(), "Target Finder Started");
   }
 
 private:
@@ -78,29 +75,7 @@ private:
 
     this->coords_[name] = coords;
     this->calculateTarget();
-    // auto request = std::make_shared<
-    //     turtle_project_interfaces::srv::TurtleCoords::Request>();
-
-    // while (!turtle_coords_client_->wait_for_service(std::chrono::seconds(1)))
-    // {
-    //   RCLCPP_WARN(get_logger(), "Waiting for spawn server");
-    // }
-
-    // auto future = turtle_coords_client_->async_send_request(
-    //     request,
-    //     [this](rclcpp::Client<turtle_project_interfaces::srv::TurtleCoords>::
-    //                SharedFuture future) { handleNewTurtleCoords(future); });
   }
-
-  // void handleNewTurtleCoords(
-  //     rclcpp::Client<turtle_project_interfaces::srv::TurtleCoords>::SharedFuture
-  //         future) {
-  //   auto result = future.get();
-  //   std::string name = result->name;
-  //   std::vector<double> coords{result->x, result->y, result->yaw_in_rad};
-
-  //   // this->coords_.push_back(coords);
-  // }
 
   void calculateTarget() {
     double x1 = masterPose_['x'];
@@ -135,8 +110,6 @@ private:
 
   rclcpp::Subscription<turtle_project_interfaces::msg::SpawnedTurtle>::SharedPtr
       turtle_spawned_subscription_;
-  rclcpp::Client<turtle_project_interfaces::srv::TurtleCoords>::SharedPtr
-      turtle_coords_client_;
   rclcpp::Subscription<turtlesim::msg::Pose>::SharedPtr
       master_turtle_pose_subscription_;
   rclcpp::Publisher<turtle_project_interfaces::msg::TargetCoordinate>::SharedPtr

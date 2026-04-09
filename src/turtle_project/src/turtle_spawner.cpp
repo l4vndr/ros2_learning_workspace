@@ -1,11 +1,11 @@
 #include "rclcpp/rclcpp.hpp"
 #include "turtle_project_interfaces/msg/spawned_turtle.hpp"
-#include "turtle_project_interfaces/srv/turtle_coords.hpp"
 #include "turtlesim/srv/spawn.hpp"
 #include <chrono>
 #include <cstdlib>
 #include <memory>
 #include <random>
+#include <rclcpp/logging.hpp>
 #include <string>
 #include <string_view>
 
@@ -16,28 +16,25 @@ public:
     spawned_turtle_info_publisher_ =
         this->create_publisher<turtle_project_interfaces::msg::SpawnedTurtle>(
             "turtle_spawn_info", 10);
-    turtle_coordinates_service_ = this->create_service<
-        turtle_project_interfaces::srv::TurtleCoords>(
-        "/get_turtle_coords",
-        [this](turtle_project_interfaces::srv::TurtleCoords::Response::SharedPtr
-                   response) { this->getTurtleCoords(response); });
 
     this->timer_ = this->create_wall_timer(std::chrono::seconds(2),
                                            [this]() { this->timerCallback(); });
+
+    RCLCPP_INFO(get_logger(), "Spawner Started");
   }
 
 private:
-  void getTurtleCoords(
-      turtle_project_interfaces::srv::TurtleCoords::Response::SharedPtr
-          response) {
-    response->success = true;
-    response->x = currentX_;
-    response->y = currentY_;
-    response->yaw_in_rad = currentYawInRads_;
-    response->name = turtleName_;
-    response->msg = "Successful Transaction";
-    return;
-  }
+  // void getTurtleCoords(
+  //     turtle_project_interfaces::srv::TurtleCoords::Response::SharedPtr
+  //         response) {
+  //   response->success = true;
+  //   response->x = currentX_;
+  //   response->y = currentY_;
+  //   response->yaw_in_rad = currentYawInRads_;
+  //   response->name = turtleName_;
+  //   response->msg = "Successful Transaction";
+  //   return;
+  // }
 
   void timerCallback() { this->spawnTurtle(); }
 
@@ -101,8 +98,6 @@ private:
   rclcpp::Publisher<turtle_project_interfaces::msg::SpawnedTurtle>::SharedPtr
       spawned_turtle_info_publisher_;
   rclcpp::Client<turtlesim::srv::Spawn>::SharedPtr turtle_spawn_client_;
-  rclcpp::Service<turtle_project_interfaces::srv::TurtleCoords>::SharedPtr
-      turtle_coordinates_service_;
   rclcpp::TimerBase::SharedPtr timer_;
   double currentX_, currentY_, currentYawInRads_;
   std::string turtleName_;

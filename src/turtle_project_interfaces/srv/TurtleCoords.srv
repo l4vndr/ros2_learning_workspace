@@ -1,8 +1,0 @@
-# Get the coords of the latest spawned turtle
----
-float64 x
-float64 y
-float64 yaw_in_rad
-string name
-bool success
-string msg
