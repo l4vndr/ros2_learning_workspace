@@ -37,7 +37,7 @@ public:
                turtle_project_interfaces::srv::RemoveTurtle::Response::SharedPtr
                    response) { this->removeTurtleService(request, response); });
 
-    timer_ = this->create_wall_timer(std::chrono::milliseconds(500),
+    timer_ = this-> create_wall_timer(std::chrono::milliseconds(500),
                                [this]() { this->timerCallback(); });
 
     RCLCPP_INFO(get_logger(), "Target Finder Started");

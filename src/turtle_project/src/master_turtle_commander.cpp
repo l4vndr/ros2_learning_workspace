@@ -23,6 +23,7 @@ public:
     master_pose_subscription_ = this->create_subscription<turtlesim::msg::Pose>(
         "/master_turtle/pose", 10, [this](turtlesim::msg::Pose msg) {
           this->updateMasterPos(msg);
+
           this->updateTargetDistance();
           this->updateTargetYaw();
         });
@@ -32,6 +33,7 @@ public:
         "/target_coord", 10,
         [this](turtle_project_interfaces::msg::TargetCoordinate msg) {
           this->updateTargetCoord(msg);
+
           this->updateTargetDistance();
           this->updateTargetYaw();
         });
@@ -44,16 +46,21 @@ public:
         this->create_client<turtle_project_interfaces::srv::RemoveTurtle>(
             "/remove_turtle");
 
-    timer_ = this->create_wall_timer(std::chrono::milliseconds(50), [this]() {
-      publishVelocityCommand();
-      handleTargetReach();
+    timer_ = this->create_wall_timer(std::chrono::milliseconds(100), [this]() {
+      this->publishVelocityCommand();
+      this->updateTargetDistance();
+      this->updateTargetYaw();
+      this->handleTargetReach();
     });
   }
 
 private:
   void handleTargetReach() {
+    if (targetHandled_)
+      return;
     std::string currentTargetName = this->targetName_;
-    if (targetDistance_ <= 0.1) {
+    if (targetDistance_ <= 0.5) {
+      targetHandled_ = true;
       auto killReq = std::make_shared<turtlesim::srv::Kill::Request>();
       auto removeReq = std::make_shared<
           turtle_project_interfaces::srv::RemoveTurtle::Request>();
@@ -68,17 +75,19 @@ private:
 
   void publishVelocityCommand() {
     auto velCmd = geometry_msgs::msg::Twist();
-    double kv = 1.25;
-    double kav = 1.25;
-    double minSpeed = 1;
+    double kv = 2;
+    double kav = 2;
+    double minSpeed = 2;
 
     double velocitX = kv * targetDistance_;
-    if (abs(targetYaw_) < 0.1) {
+    if (abs(targetYaw_) < 0.3) {
       velocitX = kv * targetDistance_;
+    } else if (abs(targetYaw_) > 0.3 && targetDistance_ <= 0.5) {
+      velocitX = 0.25 * minSpeed;
     } else {
       velocitX = minSpeed;
     }
-    velocitX = velocitX * std::cos(targetYaw_);
+    // velocitX = velocitX * std::cos(targetYaw_);
     double anglularVelocity = kav * targetYaw_;
 
     velCmd.linear.x = velocitX;
@@ -94,6 +103,9 @@ private:
   }
 
   void updateTargetCoord(turtle_project_interfaces::msg::TargetCoordinate msg) {
+    if (msg.name != targetName_) {
+      targetHandled_ = false;
+    }
     targetX_ = msg.x;
     targetY_ = msg.y;
     targetName_ = msg.name;
@@ -142,6 +154,7 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   double masterX_, masterY_, masterYaw_, targetDistance_, targetYaw_;
   double targetX_, targetY_;
+  bool targetHandled_;
   std::string targetName_;
 };
 
