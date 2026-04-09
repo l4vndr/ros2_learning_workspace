@@ -33,7 +33,7 @@ private:
     response->success = true;
     response->x = currentX_;
     response->y = currentY_;
-    response->yaw_in_rad = currentYawInRads;
+    response->yaw_in_rad = currentYawInRads_;
     response->name = turtleName_;
     response->msg = "Successful Transaction";
     return;
@@ -78,14 +78,20 @@ private:
       turtlesim::srv::Spawn::Request::SharedPtr request) {
 
     auto msg = turtle_project_interfaces::msg::SpawnedTurtle();
-    msg.spawned_turtle = true;
-    this->spawned_turtle_info_publisher_->publish(msg);
+    // msg.spawned_turtle = true;
 
     auto result = future.get();
     currentX_ = request->x;
     currentY_ = request->y;
-    currentYawInRads = request->theta;
+    currentYawInRads_ = request->theta;
     turtleName_ = result->name;
+
+    msg.turtle_name = turtleName_;
+    msg.x = currentX_;
+    msg.y = currentY_;
+    msg.yaw_in_rad = currentYawInRads_;
+    this->spawned_turtle_info_publisher_->publish(msg);
+
     RCLCPP_INFO(get_logger(), "Turtle Spawned at (%.2f, %.2f)\nName: %s",
                 currentX_, currentY_, result->name.c_str());
 
@@ -98,7 +104,7 @@ private:
   rclcpp::Service<turtle_project_interfaces::srv::TurtleCoords>::SharedPtr
       turtle_coordinates_service_;
   rclcpp::TimerBase::SharedPtr timer_;
-  double currentX_, currentY_, currentYawInRads;
+  double currentX_, currentY_, currentYawInRads_;
   std::string turtleName_;
 };
 

@@ -72,34 +72,35 @@ private:
   }
 
   void handleNewTurtleSpawn(turtle_project_interfaces::msg::SpawnedTurtle msg) {
-    if (!msg.spawned_turtle) {
-      return;
-    }
 
-    auto request = std::make_shared<
-        turtle_project_interfaces::srv::TurtleCoords::Request>();
+    std::string name = msg.turtle_name;
+    std::vector<double> coords{msg.x, msg.y, msg.yaw_in_rad};
 
-    while (!turtle_coords_client_->wait_for_service(std::chrono::seconds(1))) {
-      RCLCPP_WARN(get_logger(), "Waiting for spawn server");
-    }
-
-    auto future = turtle_coords_client_->async_send_request(
-        request,
-        [this](rclcpp::Client<turtle_project_interfaces::srv::TurtleCoords>::
-                   SharedFuture future) { handleNewTurtleCoords(future); });
-  }
-
-  void handleNewTurtleCoords(
-      rclcpp::Client<turtle_project_interfaces::srv::TurtleCoords>::SharedFuture
-          future) {
-    auto result = future.get();
-    std::string name = result->name;
-    std::vector<double> coords{result->x, result->y, result->yaw_in_rad};
-
-    // this->coords_.push_back(coords);
     this->coords_[name] = coords;
     this->calculateTarget();
+    // auto request = std::make_shared<
+    //     turtle_project_interfaces::srv::TurtleCoords::Request>();
+
+    // while (!turtle_coords_client_->wait_for_service(std::chrono::seconds(1)))
+    // {
+    //   RCLCPP_WARN(get_logger(), "Waiting for spawn server");
+    // }
+
+    // auto future = turtle_coords_client_->async_send_request(
+    //     request,
+    //     [this](rclcpp::Client<turtle_project_interfaces::srv::TurtleCoords>::
+    //                SharedFuture future) { handleNewTurtleCoords(future); });
   }
+
+  // void handleNewTurtleCoords(
+  //     rclcpp::Client<turtle_project_interfaces::srv::TurtleCoords>::SharedFuture
+  //         future) {
+  //   auto result = future.get();
+  //   std::string name = result->name;
+  //   std::vector<double> coords{result->x, result->y, result->yaw_in_rad};
+
+  //   // this->coords_.push_back(coords);
+  // }
 
   void calculateTarget() {
     double x1 = masterPose_['x'];
