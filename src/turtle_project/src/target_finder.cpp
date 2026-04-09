@@ -6,7 +6,6 @@
 #include "turtlesim/msg/pose.hpp"
 #include <chrono>
 #include <cmath>
-#include <list>
 #include <map>
 #include <memory>
 #include <string>
@@ -43,7 +42,7 @@ public:
                turtle_project_interfaces::srv::RemoveTurtle::Response::SharedPtr
                    response) { this->removeTurtleService(request, response); });
 
-    timer_ = create_wall_timer(std::chrono::microseconds(500),
+    timer_ = create_wall_timer(std::chrono::milliseconds(500),
                                [this]() { this->timerCallback(); });
   }
 
@@ -55,25 +54,8 @@ private:
           response) {
     std::string name = request->name;
     this->coords_.erase(name);
+    this->calculateTarget();
     response->success = true;
-  }
-
-  bool approximatelyEqualRel(double a, double b, double relEpsilon) {
-    return (std::abs(a - b) <=
-            (std::max(std::abs(a), std::abs(b)) * relEpsilon));
-  }
-
-  // Return true if the difference between a and b is less than or equal to
-  // absEpsilon, or within relEpsilon percent of the larger of a and b
-  bool approximatelyEqualAbsRel(double a, double b, double absEpsilon = 1e-12,
-                                double relEpsilon = 1e-8) {
-    // Check if the numbers are really close -- needed when comparing numbers
-    // near zero.
-    if (std::abs(a - b) <= absEpsilon)
-      return true;
-
-    // Otherwise fall back to Knuth's algorithm
-    return approximatelyEqualRel(a, b, relEpsilon);
   }
 
   void timerCallback() {
