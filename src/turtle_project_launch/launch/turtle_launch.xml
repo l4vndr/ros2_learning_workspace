@@ -6,7 +6,9 @@
 
     <node pkg="turtle_project" exec="target_finder"></node>
 
-    <node pkg="turtle_project" exec="turtle_spawner"></node>
+    <node pkg="turtle_project" exec="turtle_spawner">
+        <param from="$(find-pkg-share turtle_project_launch)/config/turtle_params.yaml" />
+    </node>
 
     <node pkg="turtle_project" exec="master_turtle_commander"></node>
 

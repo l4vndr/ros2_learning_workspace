@@ -14,8 +14,8 @@
 class TurtleSpawnner : public rclcpp::Node {
 public:
   TurtleSpawnner() : rclcpp::Node("turtle_spawnner") {
-    this->declare_parameter("spawn_freq", 1);
-    spawn_time_ = (1.0 / this->get_parameter("spawn_freq").as_int()) * 1000;
+    this->declare_parameter("spawn_freq", 1.0);
+    spawn_time_ = (1.0 / this->get_parameter("spawn_freq").as_double()) * 1000;
 
     turtle_spawn_client_ = this->create_client<turtlesim::srv::Spawn>("/spawn");
     spawned_turtle_info_publisher_ =
