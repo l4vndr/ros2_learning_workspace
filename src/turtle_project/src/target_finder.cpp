@@ -37,8 +37,8 @@ public:
                turtle_project_interfaces::srv::RemoveTurtle::Response::SharedPtr
                    response) { this->removeTurtleService(request, response); });
 
-    timer_ = this-> create_wall_timer(std::chrono::milliseconds(500),
-                               [this]() { this->timerCallback(); });
+    timer_ = this->create_wall_timer(std::chrono::milliseconds(100),
+                                     [this]() { this->timerCallback(); });
 
     RCLCPP_INFO(get_logger(), "Target Finder Started");
   }
@@ -57,6 +57,7 @@ private:
 
   void timerCallback() {
     auto msg = turtle_project_interfaces::msg::TargetCoordinate();
+    this->calculateTarget();
     msg.x = this->targetX_;
     msg.y = this->targetY_;
     msg.name = this->targetName_;
@@ -74,7 +75,6 @@ private:
     std::vector<double> coords{msg.x, msg.y, msg.yaw_in_rad};
 
     this->coords_[name] = coords;
-    this->calculateTarget();
   }
 
   void calculateTarget() {
