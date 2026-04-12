@@ -13,23 +13,23 @@
 
 class TurtleSpawnner : public rclcpp::Node {
 public:
-  TurtleSpawnner() : rclcpp::Node("turtle_spawnner") {
+  TurtleSpawnner() : rclcpp::Node("turtle_spawner") {
     this->declare_parameter("spawn_freq", 1.0);
+    param_handler_ = this->add_post_set_parameters_callback(
+        [this](const std::vector<rclcpp::Parameter> &params) {
+          for (auto it : params) {
+            if (it.get_name() == "spawn_freq") {
+              spawn_time_ = it.as_double();
+            }
+          }
+        });
+
     spawn_time_ = (1.0 / this->get_parameter("spawn_freq").as_double()) * 1000;
 
     turtle_spawn_client_ = this->create_client<turtlesim::srv::Spawn>("/spawn");
     spawned_turtle_info_publisher_ =
         this->create_publisher<turtle_project_interfaces::msg::SpawnedTurtle>(
             "turtle_spawn_info", 10);
-
-    param_handler_ = this->add_post_set_parameters_callback(
-        [this](const std::vector<rclcpp::Parameter> &params) {
-          for (auto it : params) {
-            if (it.get_name() == "spawn_freq") {
-              spawn_time_ = it.as_int();
-            }
-          }
-        });
 
     this->timer_ =
         this->create_wall_timer(std::chrono::milliseconds(spawn_time_),
