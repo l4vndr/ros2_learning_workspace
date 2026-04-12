@@ -6,22 +6,33 @@
 #include <memory>
 #include <random>
 #include <rclcpp/logging.hpp>
+#include <rclcpp/parameter.hpp>
 #include <string>
 #include <string_view>
+#include <vector>
 
 class TurtleSpawnner : public rclcpp::Node {
 public:
   TurtleSpawnner() : rclcpp::Node("turtle_spawnner") {
+    this->declare_parameter("spawn_freq", 1);
+    spawn_time_ = (1.0 / this->get_parameter("spawn_freq").as_int()) * 1000;
+
     turtle_spawn_client_ = this->create_client<turtlesim::srv::Spawn>("/spawn");
     spawned_turtle_info_publisher_ =
         this->create_publisher<turtle_project_interfaces::msg::SpawnedTurtle>(
             "turtle_spawn_info", 10);
 
-    this->declare_parameter("spawn_freq", 1);
-    int spawn_time = (1.0 / this->get_parameter("spawn_freq").as_int()) * 1000;
+    param_handler_ = this->add_post_set_parameters_callback(
+        [this](const std::vector<rclcpp::Parameter> &params) {
+          for (auto it : params) {
+            if (it.get_name() == "spawn_freq") {
+              spawn_time_ = it.as_int();
+            }
+          }
+        });
 
     this->timer_ =
-        this->create_wall_timer(std::chrono::milliseconds(spawn_time),
+        this->create_wall_timer(std::chrono::milliseconds(spawn_time_),
                                 [this]() { this->timerCallback(); });
 
     RCLCPP_INFO(get_logger(), "Spawner Started");
@@ -105,6 +116,8 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   double currentX_, currentY_, currentYawInRads_;
   std::string turtleName_;
+  PostSetParametersCallbackHandle::SharedPtr param_handler_;
+  int spawn_time_;
 };
 
 int main(int argc, char **argv) {
