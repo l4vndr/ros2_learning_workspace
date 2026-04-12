@@ -1,6 +1,5 @@
 #include "geometry_msgs/msg/twist.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "turtle_project_interfaces/msg/spawned_turtle.hpp"
 #include "turtle_project_interfaces/msg/target_coordinate.hpp"
 #include "turtle_project_interfaces/srv/remove_turtle.hpp"
 #include "turtlesim/msg/pose.hpp"
@@ -8,34 +7,20 @@
 #include <chrono>
 #include <cmath>
 #include <memory>
-#include <numeric>
-#include <rcl/publisher.h>
-#include <rclcpp/client.hpp>
-#include <rclcpp/node.hpp>
-#include <rclcpp/publisher.hpp>
-#include <rclcpp/subscription.hpp>
-#include <rclcpp/timer.hpp>
 #include <vector>
 
 class MasterTurtleCommander : public rclcpp::Node {
 public:
   MasterTurtleCommander() : rclcpp::Node("master_turtle_commander") {
     master_pose_subscription_ = this->create_subscription<turtlesim::msg::Pose>(
-        "/master_turtle/pose", 10, [this](turtlesim::msg::Pose msg) {
-          this->updateMasterPos(msg);
-
-          this->updateTargetDistance();
-          this->updateTargetYaw();
-        });
+        "/master_turtle/pose", 10,
+        [this](turtlesim::msg::Pose msg) { this->updateMasterPos(msg); });
 
     target_coords_subscription_ = this->create_subscription<
         turtle_project_interfaces::msg::TargetCoordinate>(
         "/target_coord", 10,
         [this](turtle_project_interfaces::msg::TargetCoordinate msg) {
           this->updateTargetCoord(msg);
-
-          this->updateTargetDistance();
-          this->updateTargetYaw();
         });
 
     velocity_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>(
@@ -46,20 +31,23 @@ public:
         this->create_client<turtle_project_interfaces::srv::RemoveTurtle>(
             "/remove_turtle");
 
-    timer_ = this->create_wall_timer(std::chrono::milliseconds(100), [this]() {
-      this->publishVelocityCommand();
-      this->updateTargetDistance();
-      this->updateTargetYaw();
-      this->handleTargetReach();
-    });
+    timer_ = this->create_wall_timer(std::chrono::milliseconds(100),
+                                     [this]() { this->control_loop(); });
   }
 
 private:
+  void control_loop() {
+    this->updateTargetDistance();
+    this->updateTargetYaw();
+    this->publishVelocityCommand();
+    this->handleTargetReach();
+  }
+
   void handleTargetReach() {
     if (targetHandled_)
       return;
     std::string currentTargetName = this->targetName_;
-    if (targetDistance_ <= 0.5) {
+    if (targetDistance_ <= 1) {
       targetHandled_ = true;
       auto killReq = std::make_shared<turtlesim::srv::Kill::Request>();
       auto removeReq = std::make_shared<
