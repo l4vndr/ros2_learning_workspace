@@ -17,8 +17,12 @@ public:
         this->create_publisher<turtle_project_interfaces::msg::SpawnedTurtle>(
             "turtle_spawn_info", 10);
 
-    this->timer_ = this->create_wall_timer(std::chrono::seconds(2),
-                                           [this]() { this->timerCallback(); });
+    this->declare_parameter("spawn_freq", 1);
+    int spawn_time = (1.0 / this->get_parameter("spawn_freq").as_int()) * 1000;
+
+    this->timer_ =
+        this->create_wall_timer(std::chrono::milliseconds(spawn_time),
+                                [this]() { this->timerCallback(); });
 
     RCLCPP_INFO(get_logger(), "Spawner Started");
   }
