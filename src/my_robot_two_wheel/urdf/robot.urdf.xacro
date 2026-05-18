@@ -41,6 +41,15 @@
 <robot name="two_wheeled_robot" xmlns:xacro="https://www.ros.org/wiki/xacro">
 
     <xacro:property name="base_length" value="0.6" />
+    <xacro:macro name="wheels" params="roll radius length material">
+        <visual name="">
+            <origin xyz="0.0 0.0 0.0" rpy="${roll} 0.0 0.0" />
+            <geometry>
+                <cylinder radius="${radius}" length="${length}" />
+            </geometry>
+            <material name="${material}" />
+        </visual>
+    </xacro:macro>
 
     <link name="base_footprint">
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
@@ -65,13 +74,14 @@
     </material>
 
     <link name="left_wheel">
-        <visual name="">
+        <!-- <visual name="">
             <origin xyz="0.0 0.0 0.0" rpy="${pi / 2.0} 0.0 0.0" />
             <geometry>
                 <cylinder radius="0.1" length="0.05" />
             </geometry>
             <material name="grey" />
-        </visual>
+        </visual> -->
+        <xacro:wheels roll="${pi/2.0}" radius="0.1" length="0.05" material="grey" />
     </link>
 
     <link name="right_wheel">
