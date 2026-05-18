@@ -38,7 +38,7 @@
     </joint>
     
 </robot> -->
-<robot name="two_wheeled_robot">
+<robot name="two_wheeled_robot" xmlns:xacro="https://www.ros.org/wiki/xacro">
 
     <link name="base_footprint">
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
