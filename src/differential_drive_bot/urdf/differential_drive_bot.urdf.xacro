@@ -260,4 +260,27 @@
         <parent link="root" />
         <child link="base_link" />
     </joint>
+
+    <!-- GAZEBO PLUGINS -->
+    <gazebo>
+        <plugin
+            filename="gz-sim-diff-drive-system"
+            name="gz::sim::systems::DiffDrive">
+            <left_joint>wheel</left_joint>
+            <right_joint>wheel_1</right_joint>
+            <wheel_separation>0.45</wheel_separation>
+            <wheel_radius>0.1</wheel_radius>
+            <frame_id>odom</frame_id>
+            <child_frame_id>root</child_frame_id>
+        </plugin>
+    </gazebo>
+
+    <gazebo>
+        <plugin
+            filename="gz-sim-joint-state-publisher-system"
+            name="gz::sim::systems::JointStatePublisher">
+            <joint_name>base_link_wheel_1</joint_name>
+            <joint_name>base_link_wheel_2</joint_name>
+        </plugin>
+    </gazebo>
 </robot>
