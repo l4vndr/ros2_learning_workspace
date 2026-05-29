@@ -266,8 +266,8 @@
         <plugin
             filename="gz-sim-diff-drive-system"
             name="gz::sim::systems::DiffDrive">
-            <left_joint>wheel</left_joint>
-            <right_joint>wheel_1</right_joint>
+            <left_joint>base_link_wheel_1</left_joint>
+            <right_joint>base_link_wheel_2</right_joint>
             <wheel_separation>0.45</wheel_separation>
             <wheel_radius>0.1</wheel_radius>
             <frame_id>odom</frame_id>
