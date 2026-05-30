@@ -137,34 +137,8 @@
             </material>
         </visual>
     </link>
-    <link name="castor_holder_castor">
-        <inertial>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <mass value="0.001" />
-            <inertia
-                ixx="1e-6"
-                ixy="0"
-                ixz="0"
-                iyy="1e-6"
-                iyz="0"
-                izz="1e-6" />
-        </inertial>
-    </link>
-    <link name="castor_holder_castor_1">
-        <inertial>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <mass value="0.001" />
-            <inertia
-                ixx="1e-6"
-                ixy="0"
-                ixz="0"
-                iyy="1e-6"
-                iyz="0"
-                izz="1e-6" />
-        </inertial>
-    </link>
     <link name="root" />
-    <link name="wheel">
+    <link name="wheel_left">
         <inertial>
             <mass value="0.981748" />
             <origin xyz="-1.94909e-18 6.12323e-18 0.0125" rpy="0 -0 0" />
@@ -173,7 +147,8 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 -0 0" />
             <geometry>
-                <mesh filename="package://differential_drive_bot/meshes/wheel.stl" scale="1 1 1" />
+                <mesh filename="package://differential_drive_bot/meshes/wheel_left.stl"
+                    scale="1 1 1" />
             </geometry>
             <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
                 <color rgba="0.647059 0.647059 0.647059 1" />
@@ -181,16 +156,17 @@
         </visual>
         <xacro:sphere_collision radius="${wheel_radius}" z="${wheel_z}" />
     </link>
-    <link name="wheel_1">
+    <link name="wheel_right">
         <inertial>
             <mass value="0.981748" />
-            <origin xyz="-1.94909e-18 6.12323e-18 0.0125" rpy="0 -0 0" />
+            <origin xyz="-1.94909e-18 4.62223e-33 0.0125" rpy="0 -0 0" />
             <inertia ixx="0.0025055" ixy="0" ixz="0" iyy="0.0025055" iyz="0" izz="0.00490874" />
         </inertial>
         <visual>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <origin xyz="0 -6.12323e-18 0" rpy="0 -0 0" />
             <geometry>
-                <mesh filename="package://differential_drive_bot/meshes/wheel.stl" scale="1 1 1" />
+                <mesh filename="package://differential_drive_bot/meshes/wheel_right.stl"
+                    scale="1 1 1" />
             </geometry>
             <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
                 <color rgba="0.647059 0.647059 0.647059 1" />
@@ -203,14 +179,16 @@
         <axis xyz="-1.38778e-16 -1 0" />
         <parent link="arm_1" />
         <child link="arm" />
-        <limit effort="1" velocity="1" lower="-2.61799" upper="2.61799" />
+        <limit effort="100" velocity="100" lower="-2.61799" upper="2.61799" />
+        <dynamics friction="0.3" damping="0.3" />
     </joint>
     <joint name="arm_mount_arm_1" type="revolute">
         <origin xyz="-2.77556e-17 -0.025 0.015" rpy="-4.18451e-28 5.55112e-17 1.38778e-16" />
         <axis xyz="-1.38778e-16 -1 0" />
         <parent link="arm_mount" />
         <child link="arm_1" />
-        <limit effort="1" velocity="1" lower="-1.5708" upper="1.5708" />
+        <limit effort="100" velocity="100" lower="-1.5708" upper="1.5708" />
+        <dynamics friction="0.3" damping="0.3" />
     </joint>
     <joint name="base_link_arm_mount" type="fixed">
         <origin xyz="-0.12 -0.2 0.15" rpy="0 -0 0" />
@@ -219,7 +197,7 @@
         <child link="arm_mount" />
     </joint>
     <joint name="base_link_castor_holder" type="fixed">
-        <origin xyz="-0.12 -0.2 -1.38778e-17" rpy="0 -0 0" />
+        <origin xyz="-0.12 -0.2 0" rpy="8.32667e-17 -0 3.14159" />
         <axis xyz="0 0 1" />
         <parent link="base_link" />
         <child link="castor_holder" />
@@ -228,50 +206,62 @@
         <origin xyz="-0.5 0 0.05" rpy="-1.5708 0 0" />
         <axis xyz="0 0 1" />
         <parent link="base_link" />
-        <child link="wheel" />
+        <child link="wheel_left" />
     </joint>
     <joint name="base_link_wheel_2" type="continuous">
         <origin xyz="-0.5 -0.4 0.05" rpy="1.5708 6.16298e-33 9.25186e-17" />
-        <axis xyz="0 0 1" />
+        <axis xyz="0 0 -1" />
         <parent link="base_link" />
-        <child link="wheel_1" />
+        <child link="wheel_right" />
     </joint>
-    <joint name="castor_holder_castor_j" type="continuous">
-        <origin xyz="0 -2.92793e-17 -0.025" rpy="0 -0 0" />
-        <axis xyz="1 0 0" />
-        <parent link="castor_holder" />
-        <child link="castor_holder_castor_1" />
-    </joint>
-    <joint name="castor_holder_castor_1j" type="continuous">
-        <origin xyz="0 0 0" rpy="0 -0 0" />
-        <axis xyz="0 1 0" />
-        <parent link="castor_holder_castor_1" />
-        <child link="castor_holder_castor" />
-    </joint>
-    <joint name="castor_holder_castor_2j" type="continuous">
-        <origin xyz="0 0 0" rpy="0 -0 0" />
+    <joint name="castor_holder_castor" type="fixed">
+        <origin xyz="0 0 -0.025" rpy="0 -0 0" />
         <axis xyz="0 0 1" />
-        <parent link="castor_holder_castor" />
+        <parent link="castor_holder" />
         <child link="castor" />
     </joint>
     <joint name="fixed_node_to_root_joint" type="fixed">
-        <origin xyz="0 0 0.05" rpy="0 -0 0" />
+        <origin xyz="0.3 0.2 0.05" rpy="0 -0 0" />
         <axis xyz="0 0 1" />
         <parent link="root" />
         <child link="base_link" />
     </joint>
 
     <!-- GAZEBO PLUGINS -->
+
+    <gazebo reference="castor">
+        <mu1 value="0.1" />
+        <mu2 value="0.1" />
+    </gazebo>
+
     <gazebo>
         <plugin
             filename="gz-sim-diff-drive-system"
             name="gz::sim::systems::DiffDrive">
             <left_joint>base_link_wheel_1</left_joint>
             <right_joint>base_link_wheel_2</right_joint>
-            <wheel_separation>0.45</wheel_separation>
+            <wheel_separation>0.4</wheel_separation>
             <wheel_radius>0.1</wheel_radius>
             <frame_id>odom</frame_id>
             <child_frame_id>root</child_frame_id>
+        </plugin>
+    </gazebo>
+
+    <gazebo>
+        <plugin
+            filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+            <joint_name>arm_mount_arm_1</joint_name>
+            <p_gain>5.0</p_gain>
+        </plugin>
+    </gazebo>
+
+    <gazebo>
+        <plugin
+            filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+            <joint_name>arm_1_arm_2</joint_name>
+            <p_gain>3.0</p_gain>
         </plugin>
     </gazebo>
 
@@ -281,6 +271,8 @@
             name="gz::sim::systems::JointStatePublisher">
             <joint_name>base_link_wheel_1</joint_name>
             <joint_name>base_link_wheel_2</joint_name>
+            <joint_name>arm_mount_arm_1</joint_name>
+            <joint_name>arm_1_arm_2</joint_name>
         </plugin>
     </gazebo>
 </robot>

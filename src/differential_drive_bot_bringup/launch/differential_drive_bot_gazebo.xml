@@ -11,7 +11,7 @@
         <param name="robot_description" value="$(command 'xacro $(var urdf_file)')" />
     </node>
 
-    <node pkg="joint_state_publisher_gui" exec="joint_state_publisher_gui"></node>
+    <!-- <node pkg="joint_state_publisher_gui" exec="joint_state_publisher_gui"></node> -->
 
     <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
         <arg name="gz_args" value="empty.sdf -r" />
