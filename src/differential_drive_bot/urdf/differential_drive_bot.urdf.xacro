@@ -107,7 +107,7 @@
         <xacro:box_collision l="${base_link_l}" b="${base_link_b}" h="${base_link_h}"
             x="${-base_link_l/2}" y="${-base_link_b/2}" z="${(base_link_h/2) - 0.025}" />
     </link>
-    <link name="camera">
+    <link name="camera_link">
         <inertial>
             <mass value="0.1675" />
             <origin xyz="-6.99007e-18 1.59925e-18 0.025" rpy="0 -0 0" />
@@ -246,7 +246,7 @@
         <origin xyz="0 -0.2 0.05" rpy="1.5708 -0 1.5708" />
         <axis xyz="0 0 1" />
         <parent link="base_link" />
-        <child link="camera" />
+        <child link="camera_link" />
     </joint>
     <joint name="fixed_node_to_root_joint" type="fixed">
         <origin xyz="0.3 0.2 0.05" rpy="0 -0 0" />
@@ -302,5 +302,33 @@
             <joint_name>arm_mount_arm_1</joint_name>
             <joint_name>arm_1_arm_2</joint_name>
         </plugin>
+    </gazebo>
+
+    <gazebo reference="camera_link">
+        <sensor name="camera" type="camera">
+            <camera>
+                <horizontal_fov>1.3962634</horizontal_fov>
+                <image>
+                    <width>640</width>
+                    <height>480</height>
+                    <format>R8G8B8</format>
+                </image>
+                <clip>
+                    <near>0.1</near>
+                    <far>15</far>
+                </clip>
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.007</stddev>
+                </noise>
+                <optical_frame_id>camera_link</optical_frame_id>
+                <camera_info_topic>camera/camera_info</camera_info_topic>
+            </camera>
+            <always_on>1</always_on>
+            <update_rate>20</update_rate>
+            <visualize>true</visualize>
+            <topic>camera/image_raw</topic>
+        </sensor>
     </gazebo>
 </robot>
