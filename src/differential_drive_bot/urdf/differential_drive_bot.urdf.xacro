@@ -114,15 +114,16 @@
             <inertia ixx="0.000152792" ixy="0" ixz="0" iyy="0.000237479" iyz="0" izz="0.000279979" />
         </inertial>
         <visual>
-            <origin xyz="-8.57036e-18 8.67362e-19 0" rpy="0 -0 0" />
+            <origin xyz="0 0 0" rpy="0 -0 0" />
             <geometry>
-                <mesh filename="package://differential_drive_bot/meshes/camera.stl" scale="1 1 1" />
+                <!-- <mesh filename="package://differential_drive_bot/meshes/camera.stl" scale="1 1 1" /> -->
+                <box size="${0.05} ${0.1} ${camera_h}"/>
             </geometry>
             <material name="0.980392_0.713725_0.003922_0.000000_0.000000">
                 <color rgba="0.980392 0.713726 0.00392157 1" />
             </material>
         </visual>
-        <xacro:box_collision l="${camera_l}" b="${camera_b}" h="${camera_h}"
+        <xacro:box_collision l="${0.05}" b="${0.1}" h="${camera_h}"
             x="${0}" y="${0}" z="${camera_h/2}" />
     </link>
     <link name="castor">
@@ -243,8 +244,8 @@
         <child link="castor" />
     </joint>
     <joint name="base_link_camera" type="fixed">
-        <origin xyz="0 -0.2 0.05" rpy="1.5708 -0 1.5708" />
-        <axis xyz="0 0 1" />
+        <origin xyz="0.025 -0.2 0.05" rpy="${0} -0 ${0}" />
+        <!-- <axis xyz="0 0 1" /> -->
         <parent link="base_link" />
         <child link="camera_link" />
     </joint>
@@ -255,6 +256,18 @@
         <child link="base_link" />
     </joint>
 
+    <!-- Camera OPEN CV SETUP -->
+    <link name="camera_link_optical">
+    </link>
+
+    <joint name="camera_optical_joint" type="fixed">
+        <!-- these values have to be these values otherwise the gazebo camera
+        image won't be aligned properly with the frame it is supposedly
+        originating from -->
+        <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+        <parent link="camera_link" />
+        <child link="camera_link_optical" />
+    </joint>
     <!-- GAZEBO PLUGINS -->
 
     <gazebo reference="castor">
@@ -322,7 +335,7 @@
                     <mean>0.0</mean>
                     <stddev>0.007</stddev>
                 </noise>
-                <optical_frame_id>camera_link</optical_frame_id>
+                <optical_frame_id>camera_link_optical</optical_frame_id>
                 <camera_info_topic>camera/camera_info</camera_info_topic>
             </camera>
             <always_on>1</always_on>
